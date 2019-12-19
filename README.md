@@ -1,6 +1,6 @@
-# crowdfunding
+# 新书众筹 
 
-## Project setup
+## 安装依赖库
 ```
 yarn install
 ```

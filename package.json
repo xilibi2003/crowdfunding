@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "core-js": "^3.4.3",
-    "vue": "^2.6.10"
+    "truffle-contract": "^4.0.31",
+    "vue": "^2.6.10",
+    "web3": "^1.2.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
@@ -29,7 +31,9 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "rules": {
+      "no-console": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }
