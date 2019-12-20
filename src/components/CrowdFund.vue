@@ -20,7 +20,7 @@
     <button :disabled="closed" @click="withdraw">赎回</button>
   </div>
 
-  <!-- 当读者还未参与时，显示如下div  -->
+  <!--  当读者还未参与时，显示如下div  -->
   <div v-if="!joined" class="card-bkg">
     <div class="award-des">
       <span> 当前众筹价格 </span>
@@ -45,6 +45,7 @@ import crowd from '../../build/contracts/Crowdfunding.json';
 
 export default {
   name: 'CrowdFund',
+  // 定义上面HTML模板中使用的变量
   data() {
     return {
       price: null,
@@ -52,11 +53,12 @@ export default {
       closed: true,
       joinPrice: null,
       joined: false,
-      endDate: "2019-08-20",
+      endDate: "null",
       isAuthor: true,
     }
   },
 
+    // 当前Vue组件被创建时回调的hook 函数
   async created() {
     await this.initWeb3Account()
     await this.initContract()
@@ -65,6 +67,7 @@ export default {
 
   methods: {
 
+    // 初始化 web3及账号
     async initWeb3Account() {
       if (window.ethereum) {
         this.provider = window.ethereum;
@@ -80,35 +83,29 @@ export default {
       }
       this.web3 = new Web3(this.provider);
 
-      this.web3.eth.getAccounts((err, accs) => {
-        if (err != null) {
-          //   console.log("无法获取账号， 是否安装了 Metamask");
-          return;
-        }
-
-        if (accs.length === 0) {
-          //   console.log("无法获取账号，Metamask 时候正确配置.");
-          return;
-        }
-
+      this.web3.eth.getAccounts().then(accs  => {
         this.account = accs[0]
       })
     },
 
+    //  初始化合约实例
     async initContract() {
       const crowdContract = contract(crowd)
       crowdContract.setProvider(this.provider)
       this.crowdFund = await crowdContract.deployed()
     },
 
-    getCrowdInfo() {
+    // 获取合约的状态信息
+    async getCrowdInfo() {
 
+      // 获取合约的余额
       this.web3.eth.getBalance(this.crowdFund.address).then(
         r => {
           this.total = this.web3.utils.fromWei(r)
         }
       )
 
+      // 获取读者的参与金额， joined 在合约中是public 的状态变量，自动生成相应的访问器函数
       this.crowdFund.joined(this.account).then(
         r => {
           if (r > 0) {
@@ -118,19 +115,24 @@ export default {
         }
       )
 
+     // 获取合约的关闭状态
       this.crowdFund.closed().then(
         r => this.closed = r
       )
 
+      // 获取当前的众筹价格
       this.crowdFund.price().then(
         r => this.price = this.web3.utils.fromWei(r)
       )
 
+      // 获取众筹截止时间
       this.crowdFund.endTime().then(r => {
         var endTime = new Date(r * 1000)
+        // 把时间戳转化为本地时间
         this.endDate = endTime.toLocaleDateString().replace(/\//g, "-") + " " + endTime.toTimeString().substr(0, 8);
       })
 
+      // 获取众筹创作者地址
       this.crowdFund.author().then(r => {
         if (this.account == r) {
           this.isAuthor = true
@@ -141,6 +143,7 @@ export default {
 
     },
 
+    // 读者点击参与众筹时调用
     join() {
       this.web3.eth.sendTransaction({
         from: this.account,
