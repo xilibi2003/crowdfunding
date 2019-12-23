@@ -31,7 +31,14 @@
   </div>
 
   <!--  如果是创作者，显示 -->
-  <div v-if="isAuthor">
+  <div class="box" v-if="isAuthor">
+    <div >
+      <p v-bind:key="item" v-for="item in joinList" >
+        <label> 地址：{{ item.address.substring(0, 30) + "..."  }} </label>
+        金额：<b> {{ item.price }} </b>
+      </p>
+    </div>
+
     <button :disabled="closed" @click="withdrawFund"> 提取资金</button>
   </div>
 
@@ -42,6 +49,7 @@
 import Web3 from "web3";
 import contract from "truffle-contract";
 import crowd from '../../build/contracts/Crowdfunding.json';
+import axios from 'axios'
 
 export default {
   name: 'CrowdFund',
@@ -55,6 +63,8 @@ export default {
       joined: false,
       endDate: "null",
       isAuthor: true,
+
+      joinList: [],
     }
   },
 
@@ -63,6 +73,7 @@ export default {
     await this.initWeb3Account()
     await this.initContract()
     await this.getCrowdInfo()
+    this.getJoins()
   },
 
   methods: {
@@ -168,7 +179,18 @@ export default {
       }).then(() => {
         this.getCrowdInfo()
       })
-    }
+    },
+
+    // 获取众筹列表
+    getJoins() {
+      axios.get('http://localhost:3000/joins')
+        .then(response => {
+          this.joinList = response.data
+        })
+        .catch(function (error) { // Ajax请求失败处理
+          console.log(error);
+        });
+    },
 
   }
 }
@@ -193,6 +215,7 @@ export default {
   padding: 11px;
 }
 
+
 .award-des {
   display: flex;
   flex-direction: column;
@@ -216,4 +239,14 @@ button {
   font-weight: 500;
   border: 1px solid #dcdfe6;
 }
+
+.box {
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+  border-radius: 5px;
+  padding: 11px;
+  margin: 10px;
+}
+
+
 </style>

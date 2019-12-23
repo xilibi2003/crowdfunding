@@ -20,6 +20,9 @@ contract Crowdfunding {
     // 作者提取资金之后，关闭众筹
     bool public closed = false;
 
+    // address[] joinAccouts;
+    event Join(address indexed user, uint price);
+
     // 部署合约时调用，初始化作者以及众筹结束时间
     constructor() public {
         author = msg.sender;
@@ -39,8 +42,11 @@ contract Crowdfunding {
 
         require (msg.value >= price, "出价太低了");
         joined[msg.sender] = msg.value;
-
+        
         updatePrice();
+        
+        emit Join(msg.sender, msg.value);     //  48820  gas
+        // joinAccouts.push(msg.sender);   // 88246  gas 
     } 
 
     // 作者提取资金
