@@ -83,7 +83,7 @@ function getJoins(callback) {
 var Crowdfunding = require('../build/contracts/Crowdfunding.json');
 const crowdFund = new web3.eth.Contract(
   Crowdfunding.abi,
-  Crowdfunding.networks[2337].address
+  Crowdfunding.networks[5777].address
 );
 
 

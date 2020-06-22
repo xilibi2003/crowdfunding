@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity >=0.6.0 <0.7.0;
 
 
 contract Crowdfunding {
@@ -36,7 +36,7 @@ contract Crowdfunding {
     }
 
     // 用户向合约转账时 触发的回调函数
-    function () external payable {
+    receive() external payable {
         require(now < endTime && !closed  , "众筹已结束");
         require(joined[msg.sender] == 0 , "你已经参与过众筹");
 
@@ -46,7 +46,7 @@ contract Crowdfunding {
         updatePrice();
         
         emit Join(msg.sender, msg.value);     //  48820  gas
-        // joinAccouts.push(msg.sender);   // 88246  gas 
+        // joinAccouts.push(msg.sender);      //  88246  gas 
     } 
 
     // 作者提取资金
