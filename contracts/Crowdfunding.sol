@@ -26,7 +26,7 @@ contract Crowdfunding {
     // 部署合约时调用，初始化作者以及众筹结束时间
     constructor() public {
         author = msg.sender;
-        endTime = now + 30 days;
+        endTime = block.timestamp + 30 days;
     }
 
     // 更新价格，这是一个内部函数
@@ -37,7 +37,7 @@ contract Crowdfunding {
 
     // 用户向合约转账时 触发的回调函数
     receive() external payable {
-        require(now < endTime && !closed  , "众筹已结束");
+        require(block.timestamp < endTime && !closed  , "众筹已结束");
         require(joined[msg.sender] == 0 , "你已经参与过众筹");
 
         require (msg.value >= price, "出价太低了");
@@ -59,7 +59,7 @@ contract Crowdfunding {
 
     // 读者赎回资金
     function withdraw() external {
-        require(now > endTime, "还未到众筹结束时间");
+        require(block.timestamp > endTime, "还未到众筹结束时间");
         require(!closed, "众筹达标，众筹资金已提取");
         require(Target > address(this).balance, "众筹达标，你没法提取资金");
         
